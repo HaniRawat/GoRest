@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"github.com/HaniRawat/GoRest/internal/config"
+	"github.com/HaniRawat/GoRest/internal/http/handlers/student"
 )
 
 func main() {
@@ -24,13 +24,11 @@ func main() {
 	//setup router
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request ) {
-		w.Write([]byte("Welcome to students api"))
-	})
+	router.HandleFunc("POST /api/students", student.New())
 
 	//setup server
-	server := http.Server {
-		Addr : cfg.Addr,
+	server := http.Server{
+		Addr:    cfg.Addr,
 		Handler: router,
 	}
 
@@ -45,13 +43,13 @@ func main() {
 		if err != nil {
 			log.Fatal("failed to start server")
 		}
-	} ()
+	}()
 
 	<-done
 
 	slog.Info("shutting down the server")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	// err := server.Shutdown(ctx)
