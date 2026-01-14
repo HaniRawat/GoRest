@@ -12,6 +12,7 @@ import (
 
 	"github.com/HaniRawat/GoRest/internal/config"
 	"github.com/HaniRawat/GoRest/internal/http/handlers/student"
+	"github.com/HaniRawat/GoRest/internal/storage/sqlite"
 )
 
 func main() {
@@ -21,10 +22,18 @@ func main() {
 	cfg := config.MustLoad()
 
 	//database setup
+	storage, err := sqlite.New(cfg)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	slog.Info("storage initialized", slog.String("env", cfg.Env), slog.String("version", "1.0.0"))
+
 	//setup router
 	router := http.NewServeMux()
 
-	router.HandleFunc("POST /api/students", student.New())
+	router.HandleFunc("POST /api/students", student.New(storage))
 
 	//setup server
 	server := http.Server{
